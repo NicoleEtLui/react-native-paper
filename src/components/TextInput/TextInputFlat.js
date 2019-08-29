@@ -33,6 +33,7 @@ class TextInputFlat extends React.Component<ChildTextInputProps, {}> {
   render() {
     const {
       disabled,
+      transparent,
       label,
       error,
       selectionColor,
@@ -70,19 +71,28 @@ class TextInputFlat extends React.Component<ChildTextInputProps, {}> {
       underlineColorCustom = underlineColor || colors.disabled;
     }
 
-    const containerStyle = {
-      backgroundColor: theme.dark
-        ? color(colors.background)
-            .lighten(0.24)
-            .rgb()
-            .string()
-        : color(colors.background)
-            .darken(0.06)
-            .rgb()
-            .string(),
-      borderTopLeftRadius: theme.roundness,
-      borderTopRightRadius: theme.roundness,
-    };
+    let containerStyle = {};
+    let labelHorizontalPadding = 0;
+    if (transparent) {
+      containerStyle = {
+        backgroundColor: 'transparent',
+      };
+      labelHorizontalPadding = RANDOM_VALUE_TO_CENTER_LABEL;
+    } else {
+      containerStyle = {
+        backgroundColor: theme.dark
+          ? color(colors.background)
+              .lighten(0.24)
+              .rgb()
+              .string()
+          : color(colors.background)
+              .darken(0.06)
+              .rgb()
+              .string(),
+        borderTopLeftRadius: theme.roundness,
+        borderTopRightRadius: theme.roundness,
+      };
+    }
 
     const labelHalfWidth = parentState.labelLayout.width / 2;
     const baseLabelTranslateX =
@@ -130,10 +140,12 @@ class TextInputFlat extends React.Component<ChildTextInputProps, {}> {
               baseLabelTranslateX > 0
                 ? baseLabelTranslateX +
                   labelHalfWidth / LABEL_PADDING_HORIZONTAL -
-                  RANDOM_VALUE_TO_CENTER_LABEL
+                  RANDOM_VALUE_TO_CENTER_LABEL -
+                  labelHorizontalPadding
                 : baseLabelTranslateX -
                   labelHalfWidth / LABEL_PADDING_HORIZONTAL +
-                  RANDOM_VALUE_TO_CENTER_LABEL,
+                  RANDOM_VALUE_TO_CENTER_LABEL -
+                  labelHorizontalPadding,
               0,
             ],
           }),
@@ -180,6 +192,9 @@ class TextInputFlat extends React.Component<ChildTextInputProps, {}> {
               onLayout={onLayoutAnimatedText}
               style={[
                 styles.placeholder,
+                {
+                  paddingHorizontal: transparent ? 0 : LABEL_PADDING_HORIZONTAL,
+                },
                 styles.placeholderFlat,
                 labelStyle,
                 {
@@ -197,6 +212,9 @@ class TextInputFlat extends React.Component<ChildTextInputProps, {}> {
             <AnimatedText
               style={[
                 styles.placeholder,
+                {
+                  paddingHorizontal: transparent ? 0 : LABEL_PADDING_HORIZONTAL,
+                },
                 styles.placeholderFlat,
                 labelStyle,
                 {
@@ -234,6 +252,11 @@ class TextInputFlat extends React.Component<ChildTextInputProps, {}> {
               this.props.label
                 ? styles.inputFlatWithLabel
                 : styles.inputFlatWithoutLabel,
+              {
+                paddingHorizontal: transparent
+                  ? 0
+                  : styles.input.paddingHorizontal,
+              },
               {
                 color: inputTextColor,
                 fontFamily,

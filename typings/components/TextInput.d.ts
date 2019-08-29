@@ -11,6 +11,7 @@ export interface TextInputProps extends NativeTextInputProps {
   onChangeText?: (text: string) => void;
   underlineColor?: string;
   multiline?: boolean;
+  transparent?: boolean;
   numberOfLines?: number;
   onFocus?: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void;
   onBlur?: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void;
