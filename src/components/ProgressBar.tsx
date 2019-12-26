@@ -7,6 +7,7 @@ import {
   ViewStyle,
   StyleProp,
   LayoutChangeEvent,
+  I18nManager,
 } from 'react-native';
 import setColor from 'color';
 import { withTheme } from '../core/theming';
@@ -44,6 +45,7 @@ type State = {
 
 const INDETERMINATE_DURATION = 2000;
 const INDETERMINATE_MAX_WIDTH = 0.6;
+const { isRTL } = I18nManager;
 
 /**
  * Progress bar is an indicator used to present progress of some activity in the app.
@@ -79,30 +81,30 @@ class ProgressBar extends React.Component<Props, State> {
   indeterminateAnimation: Animated.CompositeAnimation | null = null;
 
   componentDidUpdate(prevProps: Props) {
-    const { visible } = this.props;
+    const { visible, progress } = this.props;
 
-    if (visible !== prevProps.visible) {
+    if (progress !== prevProps.progress || visible !== prevProps.visible) {
       if (visible) {
-        this._startAnimation();
+        this.startAnimation();
       } else {
-        this._stopAnimation();
+        this.stopAnimation();
       }
     }
   }
 
-  _onLayout = (event: LayoutChangeEvent) => {
+  private onLayout = (event: LayoutChangeEvent) => {
     const { visible } = this.props;
     const { width: previousWidth } = this.state;
 
     this.setState({ width: event.nativeEvent.layout.width }, () => {
       // Start animation the very first time when previously the width was unclear
       if (visible && previousWidth === 0) {
-        this._startAnimation();
+        this.startAnimation();
       }
     });
   };
 
-  _startAnimation() {
+  private startAnimation = () => {
     const { indeterminate, progress } = this.props;
     const { fade, timer } = this.state;
 
@@ -138,9 +140,9 @@ class ProgressBar extends React.Component<Props, State> {
         isInteraction: false,
       }).start();
     }
-  }
+  };
 
-  _stopAnimation() {
+  private stopAnimation = () => {
     const { fade } = this.state;
 
     // Stop indeterminate animation
@@ -154,7 +156,7 @@ class ProgressBar extends React.Component<Props, State> {
       useNativeDriver: true,
       isInteraction: false,
     }).start();
-  }
+  };
 
   render() {
     const { color, indeterminate, style, theme } = this.props;
@@ -166,7 +168,7 @@ class ProgressBar extends React.Component<Props, State> {
       .string();
 
     return (
-      <View onLayout={this._onLayout}>
+      <View onLayout={this.onLayout}>
         <Animated.View
           style={[
             styles.container,
@@ -187,14 +189,17 @@ class ProgressBar extends React.Component<Props, State> {
                         ? {
                             inputRange: [0, 0.5, 1],
                             outputRange: [
-                              -0.5 * width,
-                              -0.5 * INDETERMINATE_MAX_WIDTH * width,
-                              0.7 * width,
+                              (isRTL ? 1 : -1) * 0.5 * width,
+                              (isRTL ? 1 : -1) *
+                                0.5 *
+                                INDETERMINATE_MAX_WIDTH *
+                                width,
+                              (isRTL ? -1 : 1) * 0.7 * width,
                             ],
                           }
                         : {
                             inputRange: [0, 1],
-                            outputRange: [-0.5 * width, 0],
+                            outputRange: [(isRTL ? 1 : -1) * 0.5 * width, 0],
                           }
                     ),
                   },

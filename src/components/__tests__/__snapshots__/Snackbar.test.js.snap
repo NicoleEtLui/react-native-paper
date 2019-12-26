@@ -50,7 +50,6 @@ exports[`renders snackbar with Text as a child 1`] = `
             "fontFamily": "System",
             "fontWeight": "400",
             "textAlign": "left",
-            "writingDirection": "ltr",
           },
           Array [
             Object {
@@ -123,7 +122,6 @@ exports[`renders snackbar with action button 1`] = `
             "fontFamily": "System",
             "fontWeight": "400",
             "textAlign": "left",
-            "writingDirection": "ltr",
           },
           Array [
             Object {
@@ -161,7 +159,9 @@ exports[`renders snackbar with action button 1`] = `
         accessibilityRole="button"
         accessibilityStates={Array []}
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -200,7 +200,6 @@ exports[`renders snackbar with action button 1`] = `
                   "fontFamily": "System",
                   "fontWeight": "400",
                   "textAlign": "left",
-                  "writingDirection": "ltr",
                 },
                 Array [
                   Object {
@@ -213,6 +212,9 @@ exports[`renders snackbar with action button 1`] = `
                     "marginHorizontal": 8,
                   },
                   Object {
+                    "textTransform": "uppercase",
+                  },
+                  Object {
                     "color": "#03dac4",
                     "fontFamily": "System",
                     "fontWeight": "500",
@@ -221,11 +223,12 @@ exports[`renders snackbar with action button 1`] = `
                     "fontFamily": "System",
                     "fontWeight": "500",
                   },
+                  undefined,
                 ],
               ]
             }
           >
-            UNDO
+            Undo
           </Text>
         </View>
       </View>
@@ -282,7 +285,6 @@ exports[`renders snackbar with content 1`] = `
             "fontFamily": "System",
             "fontWeight": "400",
             "textAlign": "left",
-            "writingDirection": "ltr",
           },
           Array [
             Object {

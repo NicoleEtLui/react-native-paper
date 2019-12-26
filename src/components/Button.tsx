@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { Animated, View, ViewStyle, StyleSheet, StyleProp } from 'react-native';
+import {
+  Animated,
+  View,
+  ViewStyle,
+  StyleSheet,
+  StyleProp,
+  TextStyle,
+} from 'react-native';
 import color from 'color';
 
 import ActivityIndicator from './ActivityIndicator';
@@ -67,6 +74,10 @@ type Props = React.ComponentProps<typeof Surface> & {
   contentStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
   /**
+   * Style for the button text.
+   */
+  labelStyle?: StyleProp<TextStyle>;
+  /**
    * @optional
    */
   theme: Theme;
@@ -118,7 +129,7 @@ class Button extends React.Component<Props, State> {
     elevation: new Animated.Value(this.props.mode === 'contained' ? 2 : 0),
   };
 
-  _handlePressIn = () => {
+  private handlePressIn = () => {
     if (this.props.mode === 'contained') {
       Animated.timing(this.state.elevation, {
         toValue: 8,
@@ -127,7 +138,7 @@ class Button extends React.Component<Props, State> {
     }
   };
 
-  _handlePressOut = () => {
+  private handlePressOut = () => {
     if (this.props.mode === 'contained') {
       Animated.timing(this.state.elevation, {
         toValue: 2,
@@ -152,6 +163,7 @@ class Button extends React.Component<Props, State> {
       style,
       theme,
       contentStyle,
+      labelStyle,
       ...rest
     } = this.props;
     const { colors, roundness } = theme;
@@ -219,7 +231,11 @@ class Button extends React.Component<Props, State> {
       borderWidth,
       borderRadius: roundness,
     };
-    const touchableStyle = { borderRadius: roundness };
+    const touchableStyle = {
+      borderRadius: style
+        ? StyleSheet.flatten(style).borderRadius || roundness
+        : roundness,
+    };
     const textStyle = { color: textColor, ...font };
     const elevation =
       disabled || mode !== 'contained' ? 0 : this.state.elevation;
@@ -239,8 +255,8 @@ class Button extends React.Component<Props, State> {
           borderless
           delayPressIn={0}
           onPress={onPress}
-          onPressIn={this._handlePressIn}
-          onPressOut={this._handlePressOut}
+          onPressIn={this.handlePressIn}
+          onPressOut={this.handlePressOut}
           accessibilityLabel={accessibilityLabel}
           accessibilityTraits={disabled ? ['button', 'disabled'] : 'button'}
           accessibilityComponentType="button"
@@ -268,15 +284,13 @@ class Button extends React.Component<Props, State> {
               style={[
                 styles.label,
                 compact && styles.compactLabel,
+                uppercase && styles.uppercaseLabel,
                 textStyle,
                 font,
+                labelStyle,
               ]}
             >
-              {React.Children.map(children, child =>
-                typeof child === 'string' && uppercase
-                  ? child.toUpperCase()
-                  : child
-              )}
+              {children}
             </Text>
           </View>
         </TouchableRipple>
@@ -311,6 +325,9 @@ const styles = StyleSheet.create({
   },
   compactLabel: {
     marginHorizontal: 8,
+  },
+  uppercaseLabel: {
+    textTransform: 'uppercase',
   },
 });
 

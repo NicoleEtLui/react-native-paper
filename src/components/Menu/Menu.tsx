@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   View,
   ViewStyle,
+  ScrollView,
   findNodeHandle,
 } from 'react-native';
 
@@ -31,7 +32,7 @@ type Props = {
   /**
    * The anchor to open the menu from. In most cases, it will be a button that opens the menu.
    */
-  anchor: React.ReactNode;
+  anchor: React.ReactNode | { x: number; y: number };
   /**
    * Extra margin to add at the top of the menu to account for translucent status bar on Android.
    * If you are using Expo, we assume translucent status bar and set a height for status bar automatically.
@@ -64,7 +65,6 @@ type State = {
   rendered: boolean;
   top: number;
   left: number;
-  windowLayout: Layout;
   menuLayout: Layout;
   anchorLayout: Layout;
   opacityAnimation: Animated.Value;
@@ -149,7 +149,6 @@ class Menu extends React.Component<Props, State> {
     rendered: this.props.visible,
     top: 0,
     left: 0,
-    windowLayout: { width: 0, height: 0 },
     menuLayout: { width: 0, height: 0 },
     anchorLayout: { width: 0, height: 0 },
     opacityAnimation: new Animated.Value(0),
@@ -158,51 +157,60 @@ class Menu extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props) {
     if (prevProps.visible !== this.props.visible) {
-      this._updateVisibility();
+      this.updateVisibility();
     }
   }
 
   componentWillUnmount() {
-    this._removeListeners();
+    this.removeListeners();
   }
 
-  _anchor?: View | null = null;
-  _menu?: View | null = null;
+  private anchor?: View | null = null;
+  private menu?: View | null = null;
 
-  _measureMenuLayout = () =>
+  private isAnchorCoord = () => !React.isValidElement(this.props.anchor);
+
+  private measureMenuLayout = () =>
     new Promise<LayoutRectangle>(resolve => {
-      if (this._menu) {
-        this._menu.measureInWindow((x, y, width, height) => {
+      if (this.menu) {
+        this.menu.measureInWindow((x, y, width, height) => {
           resolve({ x, y, width, height });
         });
       }
     });
 
-  _measureAnchorLayout = () =>
+  private measureAnchorLayout = () =>
     new Promise<LayoutRectangle>(resolve => {
-      if (this._anchor) {
-        this._anchor.measureInWindow((x, y, width, height) => {
+      const { anchor } = this.props;
+      if (this.isAnchorCoord()) {
+        // @ts-ignore
+        resolve({ x: anchor.x, y: anchor.y, width: 0, height: 0 });
+        return;
+      }
+
+      if (this.anchor) {
+        this.anchor.measureInWindow((x, y, width, height) => {
           resolve({ x, y, width, height });
         });
       }
     });
 
-  _updateVisibility = async () => {
+  private updateVisibility = async () => {
     // Menu is rendered in Portal, which updates items asynchronously
     // We need to do the same here so that the ref is up-to-date
     await Promise.resolve();
 
     if (this.props.visible) {
-      this._show();
+      this.show();
     } else {
-      this._hide();
+      this.hide();
     }
   };
 
-  _isBrowser = () => 'document' in global;
+  private isBrowser = () => Platform.OS === 'web' && 'document' in global;
 
-  _focusFirstDOMNode = (el: View | null | undefined) => {
-    if (el && this._isBrowser()) {
+  private focusFirstDOMNode = (el: View | null | undefined) => {
+    if (el && this.isBrowser()) {
       // When in the browser, we want to focus the first focusable item on toggle
       // For example, when menu is shown, focus the first item in the menu
       // And when menu is dismissed, send focus back to the button to resume tabbing
@@ -212,44 +220,43 @@ class Menu extends React.Component<Props, State> {
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
 
-      focusableNode && focusableNode.focus();
+      focusableNode?.focus();
     }
   };
 
-  _handleDismiss = () => {
+  private handleDismiss = () => {
     if (this.props.visible) {
       this.props.onDismiss();
     }
     return true;
   };
 
-  _handleKeypress = (e: KeyboardEvent) => {
+  private handleKeypress = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       this.props.onDismiss();
     }
   };
 
-  _attachListeners = () => {
-    BackHandler.addEventListener('hardwareBackPress', this._handleDismiss);
-    Dimensions.addEventListener('change', this._handleDismiss);
+  private attachListeners = () => {
+    BackHandler.addEventListener('hardwareBackPress', this.handleDismiss);
+    Dimensions.addEventListener('change', this.handleDismiss);
 
-    this._isBrowser() &&
-      document.addEventListener('keyup', this._handleKeypress);
+    this.isBrowser() && document.addEventListener('keyup', this.handleKeypress);
   };
 
-  _removeListeners = () => {
-    BackHandler.removeEventListener('hardwareBackPress', this._handleDismiss);
-    Dimensions.removeEventListener('change', this._handleDismiss);
+  private removeListeners = () => {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleDismiss);
+    Dimensions.removeEventListener('change', this.handleDismiss);
 
-    this._isBrowser() &&
-      document.removeEventListener('keyup', this._handleKeypress);
+    this.isBrowser() &&
+      document.removeEventListener('keyup', this.handleKeypress);
   };
 
-  _show = async () => {
+  private show = async () => {
     const windowLayout = Dimensions.get('window');
     const [menuLayout, anchorLayout] = await Promise.all([
-      this._measureMenuLayout(),
-      this._measureAnchorLayout(),
+      this.measureMenuLayout(),
+      this.measureAnchorLayout(),
     ]);
 
     // When visible is true for first render
@@ -263,10 +270,10 @@ class Menu extends React.Component<Props, State> {
       !windowLayout.height ||
       !menuLayout.width ||
       !menuLayout.height ||
-      !anchorLayout.width ||
-      !anchorLayout.height
+      (!anchorLayout.width && !this.isAnchorCoord()) ||
+      (!anchorLayout.height && !this.isAnchorCoord())
     ) {
-      requestAnimationFrame(this._show);
+      requestAnimationFrame(this.show);
       return;
     }
 
@@ -274,10 +281,6 @@ class Menu extends React.Component<Props, State> {
       () => ({
         left: anchorLayout.x,
         top: anchorLayout.y,
-        windowLayout: {
-          height: windowLayout.height,
-          width: windowLayout.width,
-        },
         anchorLayout: {
           height: anchorLayout.height,
           width: anchorLayout.width,
@@ -288,7 +291,7 @@ class Menu extends React.Component<Props, State> {
         },
       }),
       () => {
-        this._attachListeners();
+        this.attachListeners();
 
         const { animation } = this.props.theme;
         Animated.parallel([
@@ -306,15 +309,15 @@ class Menu extends React.Component<Props, State> {
           }),
         ]).start(({ finished }) => {
           if (finished) {
-            this._focusFirstDOMNode(this._menu);
+            this.focusFirstDOMNode(this.menu);
           }
         });
       }
     );
   };
 
-  _hide = () => {
-    this._removeListeners();
+  private hide = () => {
+    this.removeListeners();
 
     const { animation } = this.props.theme;
     Animated.timing(this.state.opacityAnimation, {
@@ -324,9 +327,9 @@ class Menu extends React.Component<Props, State> {
       useNativeDriver: true,
     }).start(finished => {
       if (finished) {
-        this._focusFirstDOMNode(this._anchor);
-
+        this.setState({ menuLayout: { width: 0, height: 0 } });
         this.state.scaleAnimation.setValue({ x: 0, y: 0 });
+        this.focusFirstDOMNode(this.anchor);
         this.setState({ rendered: false });
       }
     });
@@ -346,20 +349,19 @@ class Menu extends React.Component<Props, State> {
 
     const {
       rendered,
-      windowLayout,
       menuLayout,
       anchorLayout,
       opacityAnimation,
       scaleAnimation,
     } = this.state;
 
+    let { left, top } = this.state;
+
     // I don't know why but on Android measure function is wrong by 24
     const additionalVerticalValue = Platform.select({
       android: statusBarHeight,
       default: 0,
     });
-
-    let { left, top } = this.state;
 
     const scaleTransforms = [
       {
@@ -376,6 +378,8 @@ class Menu extends React.Component<Props, State> {
       },
     ];
 
+    const windowLayout = Dimensions.get('window');
+
     // We need to translate menu while animating scale to imitate transform origin for scale animation
     const positionTransforms = [];
 
@@ -389,7 +393,7 @@ class Menu extends React.Component<Props, State> {
       });
 
       // Check if menu position has enough space from left side
-      if (left >= 0 && left < SCREEN_INDENT) {
+      if (left < SCREEN_INDENT) {
         left = SCREEN_INDENT;
       }
     } else {
@@ -404,48 +408,109 @@ class Menu extends React.Component<Props, State> {
 
       const right = left + menuLayout.width;
       // Check if menu position has enough space from right side
-      if (
-        right <= windowLayout.width &&
-        right > windowLayout.width - SCREEN_INDENT
-      ) {
+      if (right > windowLayout.width - SCREEN_INDENT) {
         left = windowLayout.width - SCREEN_INDENT - menuLayout.width;
       }
     }
 
-    // Check if menu fits vertically and if not align it to bottom.
-    if (top <= windowLayout.height - menuLayout.height - SCREEN_INDENT) {
+    // If the menu is larger than available vertical space,
+    // calculate the height of scrollable view
+    let scrollableMenuHeight = 0;
+
+    // Check if the menu should be scrollable
+    if (
+      // Check if the menu overflows from bottom side
+      top >=
+        windowLayout.height -
+          menuLayout.height -
+          SCREEN_INDENT -
+          additionalVerticalValue &&
+      // And bottom side of the screen has more space than top side
+      top <= windowLayout.height - top
+    ) {
+      // Scrollable menu should be below the anchor (expands downwards)
+      scrollableMenuHeight =
+        windowLayout.height - top - SCREEN_INDENT - additionalVerticalValue;
+    } else if (
+      // Check if the menu overflows from bottom side
+      top >=
+        windowLayout.height -
+          menuLayout.height -
+          SCREEN_INDENT -
+          additionalVerticalValue &&
+      // And top side of the screen has more space than bottom side
+      top >= windowLayout.height - top &&
+      // And menu overflows from top side
+      top <=
+        menuLayout.height -
+          anchorLayout.height +
+          SCREEN_INDENT -
+          additionalVerticalValue
+    ) {
+      // Scrollable menu should be above the anchor (expands upwards)
+      scrollableMenuHeight =
+        top + anchorLayout.height - SCREEN_INDENT + additionalVerticalValue;
+    }
+
+    // Scrollable menu max height
+    scrollableMenuHeight =
+      scrollableMenuHeight > windowLayout.height - 2 * SCREEN_INDENT
+        ? windowLayout.height - 2 * SCREEN_INDENT
+        : scrollableMenuHeight;
+
+    // Menu is typically positioned below the element that generates it
+    // So first check if it fits below the anchor (expands downwards)
+    if (
+      // Check if menu fits vertically
+      top <=
+        windowLayout.height -
+          menuLayout.height -
+          SCREEN_INDENT -
+          additionalVerticalValue ||
+      // Or if the menu overflows from bottom side
+      (top >=
+        windowLayout.height -
+          menuLayout.height -
+          SCREEN_INDENT -
+          additionalVerticalValue &&
+        // And bottom side of the screen has more space than top side
+        top <= windowLayout.height - top)
+    ) {
       positionTransforms.push({
         translateY: scaleAnimation.y.interpolate({
           inputRange: [0, menuLayout.height],
-          outputRange: [-(menuLayout.height / 2), 0],
+          outputRange: [-((scrollableMenuHeight || menuLayout.height) / 2), 0],
         }),
       });
 
       // Check if menu position has enough space from top side
-      if (top >= 0 && top < SCREEN_INDENT) {
+      if (top < SCREEN_INDENT) {
         top = SCREEN_INDENT;
       }
     } else {
       positionTransforms.push({
         translateY: scaleAnimation.y.interpolate({
           inputRange: [0, menuLayout.height],
-          outputRange: [menuLayout.height / 2, 0],
+          outputRange: [(scrollableMenuHeight || menuLayout.height) / 2, 0],
         }),
       });
 
-      top += anchorLayout.height - menuLayout.height;
+      top += anchorLayout.height - (scrollableMenuHeight || menuLayout.height);
 
-      const bottom = top + menuLayout.height + additionalVerticalValue;
+      const bottom =
+        top +
+        (scrollableMenuHeight || menuLayout.height) +
+        additionalVerticalValue;
+
       // Check if menu position has enough space from bottom side
-      if (
-        bottom <= windowLayout.height &&
-        bottom > windowLayout.height - SCREEN_INDENT
-      ) {
+      if (bottom > windowLayout.height - SCREEN_INDENT) {
         top =
-          windowLayout.height -
-          SCREEN_INDENT -
-          menuLayout.height -
-          additionalVerticalValue;
+          scrollableMenuHeight === windowLayout.height - 2 * SCREEN_INDENT
+            ? -SCREEN_INDENT * 2
+            : windowLayout.height -
+              menuLayout.height -
+              SCREEN_INDENT -
+              additionalVerticalValue;
       }
     }
 
@@ -453,21 +518,22 @@ class Menu extends React.Component<Props, State> {
       opacity: opacityAnimation,
       transform: scaleTransforms,
       borderRadius: theme.roundness,
+      ...(scrollableMenuHeight ? { height: scrollableMenuHeight } : {}),
     };
 
     const positionStyle = {
-      top: top + additionalVerticalValue,
+      top: this.isAnchorCoord() ? top : top + additionalVerticalValue,
       ...(I18nManager.isRTL ? { right: left } : { left }),
     };
 
     return (
       <View
         ref={ref => {
-          this._anchor = ref;
+          this.anchor = ref;
         }}
         collapsable={false}
       >
-        {anchor}
+        {this.isAnchorCoord() ? null : anchor}
         {rendered ? (
           <Portal>
             <TouchableWithoutFeedback onPress={onDismiss}>
@@ -475,7 +541,7 @@ class Menu extends React.Component<Props, State> {
             </TouchableWithoutFeedback>
             <View
               ref={ref => {
-                this._menu = ref;
+                this.menu = ref;
               }}
               collapsable={false}
               accessibilityViewIsModal={visible}
@@ -492,7 +558,9 @@ class Menu extends React.Component<Props, State> {
                     ] as StyleProp<ViewStyle>
                   }
                 >
-                  {children}
+                  {(scrollableMenuHeight && (
+                    <ScrollView>{children}</ScrollView>
+                  )) || <React.Fragment>{children}</React.Fragment>}
                 </Surface>
               </Animated.View>
             </View>

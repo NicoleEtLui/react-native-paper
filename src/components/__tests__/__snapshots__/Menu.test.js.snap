@@ -21,7 +21,9 @@ exports[`renders menu with content styles 1`] = `
       accessibilityRole="button"
       accessibilityStates={Array []}
       accessible={true}
+      focusable={false}
       isTVSelectable={true}
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -60,7 +62,6 @@ exports[`renders menu with content styles 1`] = `
                 "fontFamily": "System",
                 "fontWeight": "400",
                 "textAlign": "left",
-                "writingDirection": "ltr",
               },
               Array [
                 Object {
@@ -71,6 +72,9 @@ exports[`renders menu with content styles 1`] = `
                 },
                 undefined,
                 Object {
+                  "textTransform": "uppercase",
+                },
+                Object {
                   "color": "#6200ee",
                   "fontFamily": "System",
                   "fontWeight": "500",
@@ -79,11 +83,12 @@ exports[`renders menu with content styles 1`] = `
                   "fontFamily": "System",
                   "fontWeight": "500",
                 },
+                undefined,
               ],
             ]
           }
         >
-          OPEN MENU
+          Open menu
         </Text>
       </View>
     </View>
@@ -112,7 +117,9 @@ exports[`renders not visible menu 1`] = `
       accessibilityRole="button"
       accessibilityStates={Array []}
       accessible={true}
+      focusable={false}
       isTVSelectable={true}
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -151,7 +158,6 @@ exports[`renders not visible menu 1`] = `
                 "fontFamily": "System",
                 "fontWeight": "400",
                 "textAlign": "left",
-                "writingDirection": "ltr",
               },
               Array [
                 Object {
@@ -162,6 +168,9 @@ exports[`renders not visible menu 1`] = `
                 },
                 undefined,
                 Object {
+                  "textTransform": "uppercase",
+                },
+                Object {
                   "color": "#6200ee",
                   "fontFamily": "System",
                   "fontWeight": "500",
@@ -170,11 +179,12 @@ exports[`renders not visible menu 1`] = `
                   "fontFamily": "System",
                   "fontWeight": "500",
                 },
+                undefined,
               ],
             ]
           }
         >
-          OPEN MENU
+          Open menu
         </Text>
       </View>
     </View>
@@ -203,7 +213,9 @@ exports[`renders visible menu 1`] = `
       accessibilityRole="button"
       accessibilityStates={Array []}
       accessible={true}
+      focusable={false}
       isTVSelectable={true}
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -242,7 +254,6 @@ exports[`renders visible menu 1`] = `
                 "fontFamily": "System",
                 "fontWeight": "400",
                 "textAlign": "left",
-                "writingDirection": "ltr",
               },
               Array [
                 Object {
@@ -253,6 +264,9 @@ exports[`renders visible menu 1`] = `
                 },
                 undefined,
                 Object {
+                  "textTransform": "uppercase",
+                },
+                Object {
                   "color": "#6200ee",
                   "fontFamily": "System",
                   "fontWeight": "500",
@@ -261,11 +275,12 @@ exports[`renders visible menu 1`] = `
                   "fontFamily": "System",
                   "fontWeight": "500",
                 },
+                undefined,
               ],
             ]
           }
         >
-          OPEN MENU
+          Open menu
         </Text>
       </View>
     </View>

@@ -5,7 +5,9 @@ exports[`renders expanded accordion 1`] = `
   <View
     accessibilityRole="button"
     accessible={true}
+    focusable={true}
     isTVSelectable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -55,7 +57,6 @@ exports[`renders expanded accordion 1`] = `
                 "fontFamily": "System",
                 "fontWeight": "400",
                 "textAlign": "left",
-                "writingDirection": "ltr",
               },
               Array [
                 Object {
@@ -121,7 +122,9 @@ exports[`renders expanded accordion 1`] = `
   </View>
   <View
     accessible={true}
+    focusable={false}
     isTVSelectable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -171,7 +174,6 @@ exports[`renders expanded accordion 1`] = `
                 "fontFamily": "System",
                 "fontWeight": "400",
                 "textAlign": "left",
-                "writingDirection": "ltr",
               },
               Array [
                 Object {
@@ -198,7 +200,9 @@ exports[`renders list accordion with children 1`] = `
   <View
     accessibilityRole="button"
     accessible={true}
+    focusable={true}
     isTVSelectable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -298,7 +302,6 @@ exports[`renders list accordion with children 1`] = `
                 "fontFamily": "System",
                 "fontWeight": "400",
                 "textAlign": "left",
-                "writingDirection": "ltr",
               },
               Array [
                 Object {
@@ -370,7 +373,9 @@ exports[`renders list accordion with custom title and description styles 1`] = `
   <View
     accessibilityRole="button"
     accessible={true}
+    focusable={true}
     isTVSelectable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -420,7 +425,6 @@ exports[`renders list accordion with custom title and description styles 1`] = `
                 "fontFamily": "System",
                 "fontWeight": "400",
                 "textAlign": "left",
-                "writingDirection": "ltr",
               },
               Array [
                 Object {
@@ -447,7 +451,6 @@ exports[`renders list accordion with custom title and description styles 1`] = `
                 "fontFamily": "System",
                 "fontWeight": "400",
                 "textAlign": "left",
-                "writingDirection": "ltr",
               },
               Array [
                 Object {
@@ -525,7 +528,9 @@ exports[`renders list accordion with left items 1`] = `
   <View
     accessibilityRole="button"
     accessible={true}
+    focusable={true}
     isTVSelectable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -625,7 +630,6 @@ exports[`renders list accordion with left items 1`] = `
                 "fontFamily": "System",
                 "fontWeight": "400",
                 "textAlign": "left",
-                "writingDirection": "ltr",
               },
               Array [
                 Object {
@@ -697,7 +701,9 @@ exports[`renders multiline list accordion 1`] = `
   <View
     accessibilityRole="button"
     accessible={true}
+    focusable={true}
     isTVSelectable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -747,7 +753,6 @@ exports[`renders multiline list accordion 1`] = `
                 "fontFamily": "System",
                 "fontWeight": "400",
                 "textAlign": "left",
-                "writingDirection": "ltr",
               },
               Array [
                 Object {
@@ -772,7 +777,6 @@ exports[`renders multiline list accordion 1`] = `
                 "fontFamily": "System",
                 "fontWeight": "400",
                 "textAlign": "left",
-                "writingDirection": "ltr",
               },
               Array [
                 Object {
